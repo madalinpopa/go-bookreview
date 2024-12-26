@@ -1,0 +1,68 @@
+{{template "base" .}}
+
+{{define "title"}}Book Review - Books{{end}}
+
+{{define "main"}}
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 h-full flex flex-col">
+
+        <!-- Header with Search -->
+        {{template "booksHeader" .}}
+
+        <!-- Book List -->
+        <div hx-trigger="revealed, books-list-changed from:body"
+             hx-get="/books"
+             hx-swap="innerHTML settle:100ms"
+             hx-target="#books-content">
+            <div id="books-content"></div>
+        </div>
+
+    </div>
+
+{{end}}
+
+{{define "htmxBookCard"}}
+    <div id="fade-me-in"
+         class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-items-center">
+        {{with .Books}}
+            {{range .}}
+                <div class="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow w-full max-w-xs cursor-pointer">
+                    <a href="/books/{{.ID}}" hx-push-url="true" hx-swap="innerHTML show:window:top" hx-boost="true"
+                       hx-target="#books-content" class="block">
+                        <div class="aspect-[3/4] bg-slate-100 relative">
+                            {{if .ImageURL}}
+                                <img src="{{.ImageURL}}" alt="{{.Title}}" class="w-full h-full object-cover">
+                            {{else}}
+                                <div class="absolute inset-0 flex items-center justify-center text-slate-400">
+                                    <iconify-icon icon="heroicons:book-open" width="64"></iconify-icon>
+                                </div>
+                            {{end}}
+                        </div>
+                        <div class="p-3">
+                            <h3 class="font-medium text-slate-800 text-sm mb-1 line-clamp-2 hover:text-teal-600">
+                                {{.Title}}
+                            </h3>
+                            <p class="text-xs text-slate-600">{{.Author}}</p>
+                            <div class="flex items-center gap-2 mt-2 text-xs text-slate-600">
+                                {{if .PublicationYear}}
+                                    <span>{{.PublicationYear}}</span>
+                                {{end}}
+                                {{if .ISBN}}
+                                    <span class="truncate">ISBN: {{.ISBN}}</span>
+                                {{end}}
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            {{end}}
+        {{else}}
+            <div class="col-span-full text-center py-12">
+                <div class="text-slate-400 mb-3">
+                    <iconify-icon icon="heroicons:book-open" width="96" class="inline-block"></iconify-icon>
+                </div>
+                <h3 class="text-lg font-medium text-slate-800">No books yet</h3>
+                <p class="text-slate-600 mt-1">Get started by adding your first book</p>
+            </div>
+        {{end}}
+    </div>
+    {{template "pagination" .}}
+{{end}}

@@ -1,0 +1,43 @@
+{{define "booksHeader"}}
+
+    <div class="mb-8 space-y-4">
+
+        <!-- Header -->
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-800">Book Collection</h1>
+                <p class="text-sm text-slate-600 mt-1">Browse and manage your reading list</p>
+            </div>
+            {{if .IsAuthenticated}}
+                <button hx-get="/books/new"
+                        hx-target="#books-content"
+                        hx-swap="innerHTML"
+                        hx-push-url="true"
+                        hx-trigger="click, reload-book-form from:body"
+                        hx-boost="true"
+                        class="bg-teal-600 text-white px-4 py-2 rounded-md hover:bg-teal-500 transition-colors inline-flex items-center gap-2">
+                    <iconify-icon icon="heroicons:plus"></iconify-icon>
+                    Add Book
+                </button>
+            {{end}}
+        </div>
+
+        <!-- Search Bar -->
+        <div class="relative">
+            <label for="search" class="sr-only">Search</label>
+            <input hx-get="/api/search"
+                   hx-target="#books-content"
+                   hx-swap="innerHTML"
+                   hx-trigger="keyup delay:500ms"
+                   type="text"
+                   id="search"
+                   name="search"
+                   placeholder="Search books, notes, or reviews..."
+                   class="w-full pl-10 pr-4 py-2 rounded-lg border-slate-300 focus:border-teal-500 focus:ring-teal-500">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <iconify-icon icon="heroicons:magnifying-glass" class="text-slate-400"></iconify-icon>
+            </div>
+        </div>
+    </div>
+
+{{end}}

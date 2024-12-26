@@ -1,0 +1,541 @@
+{{template "base" .}}
+
+{{define "title"}}Book Review - Detail{{end}}
+
+{{define "main"}}
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 h-full flex flex-col">
+
+        <!-- Header with Search -->
+        {{template "booksHeader" .}}
+
+        <!-- Book Detail -->
+        <div hx-trigger="revealed"
+             hx-get="/books/{{.Book.ID}}"
+             hx-swap="innerHTML show:window:top"
+             hx-target="#books-content">
+            <div id="books-content"></div>
+        </div>
+
+    </div>
+
+{{end}}
+
+<!-- Partial template for book detail -->
+{{define "htmxBookDetail"}}
+    <div id="fade-me-in" class="max-w-7xl mx-auto h-full flex flex-col">
+        <!-- Back Navigation -->
+        <div class="mb-6">
+            <button hx-get="/books"
+                    hx-target="#books-content"
+                    hx-swap="innerHTML"
+                    hx-push-url="true"
+                    class="inline-flex items-center text-sm text-slate-600 hover:text-teal-600 transition-colors">
+                <iconify-icon icon="heroicons:arrow-long-left" class="mr-2"></iconify-icon>
+                Back to Books
+            </button>
+        </div>
+
+        <!-- Book Detail Content -->
+        <div class="bg-white rounded-lg shadow-sm">
+
+            <!-- Book Info Section -->
+            <div class="p-6 border-b border-slate-200">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Book Cover -->
+                    <div class="aspect-[3/4] bg-slate-100 rounded-lg overflow-hidden">
+                        {{if .Book.ImageURL}}
+                            <img src="{{.Book.ImageURL}}" alt="{{.Book.Title}}" class="w-full h-full object-cover">
+                        {{else}}
+                            <div class="w-full h-full flex items-center justify-center text-slate-400">
+                                <iconify-icon icon="heroicons:book-open" width="64"></iconify-icon>
+                            </div>
+                        {{end}}
+                    </div>
+
+                    <!-- Book Details -->
+                    <div class="md:col-span-2 space-y-4">
+                        <h1 class="text-2xl font-bold text-slate-800">{{.Book.Title}}</h1>
+                        <div class="space-y-2">
+                            <p class="text-lg text-slate-600">{{.Book.Author}}</p>
+                            {{if .Book.ISBN}}
+                                <p class="text-sm text-slate-600">ISBN: {{.Book.ISBN}}</p>
+                            {{end}}
+                            {{if .Book.PublicationYear}}
+                                <p class="text-sm text-slate-600">Published: {{.Book.PublicationYear}}</p>
+                            {{end}}
+                        </div>
+
+                        <!-- Action Buttons -->
+                        {{if eq .Book.UserId $.AuthenticatedUserId}}
+                            <div class="flex gap-3 pt-4">
+                                <button hx-get="/books/{{.Book.ID}}/edit"
+                                        hx-target="#books-content"
+                                        hx-push-url="true"
+                                        class="inline-flex items-center px-4 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-500 transition-colors">
+                                    <iconify-icon icon="heroicons:pencil" class="mr-2"></iconify-icon>
+                                    Edit Book
+                                </button>
+                                <form hx-post="/books/delete" hx-confirm="Are you sure you want to delete this book?">
+                                    <input type="hidden" name="id" value="{{.Book.ID}}">
+                                    <button type="submit"
+                                            class="inline-flex items-center px-4 py-2 border border-red-200 text-red-600 rounded-md hover:bg-red-50 transition-colors">
+                                        <iconify-icon icon="heroicons:trash" class="mr-2"></iconify-icon>
+                                        Delete
+                                    </button>
+                                </form>
+                            </div>
+                        {{end}}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabs Navigation -->
+            <div class="border-b border-slate-200">
+                <nav class="flex -mb-px">
+                    <button hx-get="/books/{{.Book.ID}}/reviews"
+                            hx-target="#tab-content"
+                            hx-trigger="load, click, update-reviews from:body"
+                            hx-swap="innerHTML"
+                            id="tab-reviews"
+                            class="px-6 py-3 border-b-2 border-teal-600 text-teal-600 font-medium">
+                        Reviews
+                    </button>
+                    <button hx-get="/books/{{.Book.ID}}/notes"
+                            hx-target="#tab-content"
+                            hx-trigger="click, update-notes from:body"
+                            hx-swap="innerHTML"
+                            id="tab-notes"
+                            class="px-6 py-3 border-b-2 border-transparent text-slate-600 hover:text-slate-800 hover:border-slate-300">
+                        Notes
+                    </button>
+                </nav>
+            </div>
+
+            <!-- Tab Content -->
+            <div class="p-6">
+                <!-- Reviews/Notes content will be loaded here -->
+                <div id="tab-content"></div>
+            </div>
+        </div>
+    </div>
+{{end}}
+
+<!-- Partial Template for Reviews -->
+{{define "htmxBookReviews"}}
+    <div class="space-y-6">
+        <!-- Add Review Button -->
+        {{if .IsAuthenticated}}
+            <div class="flex justify-end">
+                <button hx-get="/books/{{.Book.ID}}/review/new"
+                        hx-target="#tab-content"
+                        hx-swap="innerHTML focus-scroll:true"
+                        class="inline-flex items-center px-4 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-500 transition-colors">
+                    <iconify-icon icon="heroicons:plus" class="mr-2"></iconify-icon>
+                    Add Review
+                </button>
+            </div>
+        {{end}}
+
+        <!-- Reviews List -->
+        {{if .Reviews}}
+            <div class="space-y-6">
+                {{range $review := .Reviews}}
+                    <div id="review-card-{{.ID}}" class="border-l-4 border-teal-500 bg-slate-50 rounded-r-lg p-4">
+                        <div class="flex justify-between items-start">
+                            <div class="space-y-1">
+                                <!-- Rating Stars -->
+                                <div class="flex text-amber-500">
+                                    {{range $i := iterate 5}}
+                                        {{if le (add $i 1) $review.Rating}}
+                                            <iconify-icon icon="heroicons:star-solid" width="16"></iconify-icon>
+                                        {{else}}
+                                            <iconify-icon icon="heroicons:star" width="16"></iconify-icon>
+                                        {{end}}
+                                    {{end}}
+                                </div>
+                                <!-- Review Text -->
+                                <p class="text-slate-800">{{.ReviewText}}</p>
+                                <!-- Review Meta -->
+                                <p class="text-sm text-slate-600">
+                                    Posted by {{.Username}} on {{humanDate .CreatedAt}}
+                                </p>
+                            </div>
+
+                            <!-- Action Buttons (if owner) -->
+                            {{if eq .UserId $.AuthenticatedUserId}}
+                                <div class="flex gap-2">
+                                    <button hx-get="/books/review/{{.ID}}/edit"
+                                            hx-target="#tab-content"
+                                            hx-swap="innerHTML focus-scroll:true"
+                                            class="text-slate-600 hover:text-teal-600">
+                                        <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
+                                    </button>
+                                    <form hx-post="/books/review/delete"
+                                          hx-swap="delete"
+                                          hx-target="#review-card-{{.ID}}"
+                                          hx-confirm="Are you sure you want to delete this review?">
+                                        <input type="hidden" name="id" value="{{.ID}}">
+                                        <button type="submit"
+                                                class="text-slate-600 hover:text-red-600">
+                                            <iconify-icon icon="heroicons:trash"></iconify-icon>
+                                        </button>
+                                    </form>
+                                </div>
+                            {{end}}
+                        </div>
+                    </div>
+                {{end}}
+            </div>
+        {{else}}
+            <!-- Empty State -->
+            <div class="text-center py-12">
+                <div class="text-slate-400 mb-3">
+                    <iconify-icon icon="carbon:review" width="48" class="inline-block"></iconify-icon>
+                </div>
+                <h3 class="text-lg font-medium text-slate-800">No reviews yet</h3>
+                <p class="text-slate-600 mt-1">Be the first to review this book</p>
+            </div>
+        {{end}}
+    </div>
+
+    <!-- HTMX Swap Oob -->
+    <button hx-get="/books/{{.Book.ID}}/notes"
+            hx-target="#tab-content"
+            hx-trigger="click, update-notes from:body"
+            hx-swap="innerHTML"
+            id="tab-notes"
+            hx-swap-oob="true"
+            class="px-6 py-3 border-b-2 border-transparent text-slate-600 hover:text-slate-800 hover:border-slate-300">
+        Notes
+    </button>
+
+    <button hx-get="/books/{{.Book.ID}}/reviews"
+            hx-target="#tab-content"
+            hx-trigger="click, update-reviews from:body"
+            hx-swap="innerHTML"
+            id="tab-reviews"
+            hx-swap-oob="true"
+            class="px-6 py-3 border-b-2 border-teal-600 text-teal-600 font-medium">
+        Reviews
+    </button>
+{{end}}
+
+<!-- Partial template to add book review -->
+{{define "htmxBookReviewForm"}}
+    <div class="space-y-6">
+        <!-- Back Button -->
+        <div class="flex justify-start">
+            <button hx-get="/books/{{.Book.ID}}/reviews"
+                    hx-target="#tab-content"
+                    hx-swap="innerHTML"
+                    class="inline-flex items-center text-sm text-slate-600 hover:text-teal-600 transition-colors">
+                <iconify-icon icon="heroicons:arrow-long-left" class="mr-2"></iconify-icon>
+                Back to Reviews
+            </button>
+        </div>
+
+        <!-- Form Container -->
+        <div class="bg-slate-50 rounded-lg p-6">
+            <h3 class="text-lg font-medium text-slate-800 mb-4">Write a Review</h3>
+
+            <form
+                    {{if gt .Review.ID 0}}
+                        hx-post="/books/review/edit"
+                    {{else}}
+                        hx-post="/books/review/new"
+                    {{end}}
+                    class="space-y-6">
+
+                <!-- Hidden Book ID -->
+                <input type="hidden" name="book_id" value="{{.Book.ID}}">
+                <input type="hidden" name="id" value="{{.Form.Id}}">
+
+
+                <!-- Show any non-field errors -->
+                {{range .Form.NonFieldErrors}}
+                    <div class="bg-red-50 border border-red-100 text-red-600 text-sm rounded-md p-4">{{.}}</div>
+                {{end}}
+
+                <!-- Rating Field -->
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-slate-700">Rating<span
+                                class="text-red-500">*</span></label>
+                    <div class="flex gap-4">
+                        {{range $i := iterate 5}}
+                            <label class="relative">
+                                <input type="radio"
+                                       name="rating"
+                                       value="{{add $i 1}}"
+                                       {{if eq $.Form.Rating $i}}checked{{end}}
+                                       class="sr-only peer">
+                                <div class="w-12 h-12 flex items-center justify-center rounded-lg border-2 border-slate-200
+                                          text-slate-400 cursor-pointer
+                                          peer-checked:border-teal-500 peer-checked:text-teal-500
+                                          hover:border-teal-500 hover:text-teal-500
+                                          transition-colors">
+                                    {{add $i 1}}
+                                </div>
+                            </label>
+                        {{end}}
+                    </div>
+                    {{with .Form.FieldErrors.rating}}
+                        <p class="text-sm text-red-600">{{.}}</p>
+                    {{end}}
+                </div>
+
+                <!-- Review Text Field -->
+                <div class="space-y-2">
+                    <label for="review_text" class="block text-sm font-medium text-slate-700">
+                        Review<span class="text-red-500">*</span>
+                    </label>
+                    <textarea name="review_text"
+                              id="review_text"
+                              rows="4"
+                              placeholder="Share your thoughts about this book..."
+                              class="block w-full rounded-md border-slate-300 shadow-sm
+                                     focus:border-teal-500 focus:ring-teal-500">{{.Form.ReviewText}}</textarea>
+                    {{with .Form.FieldErrors.reviewText}}
+                        <p class="text-sm text-red-600">{{.}}</p>
+                    {{end}}
+                </div>
+
+                <!-- Form Actions -->
+                <div class="flex justify-end gap-3 pt-4">
+                    <button type="button"
+                            hx-get="/books/{{.Book.ID}}/reviews"
+                            hx-target="#tab-content"
+                            hx-swap="innerHTML"
+                            class="px-4 py-2 border border-slate-300 rounded-md text-slate-700
+                                   hover:bg-slate-50 transition-colors">
+                        Cancel
+                    </button>
+                    <button type="submit"
+                            class="px-4 py-2 bg-teal-600 text-white rounded-md
+                                   hover:bg-teal-500 transition-colors">
+                        Post Review
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- HTMX Swap Oob for tab states -->
+    <button hx-get="/books/{{.Book.ID}}/notes"
+            hx-target="#tab-content"
+            hx-trigger="click, update-notes from:body"
+            hx-swap="innerHTML"
+            id="tab-notes"
+            hx-swap-oob="true"
+            class="px-6 py-3 border-b-2 border-transparent text-slate-600 hover:text-slate-800 hover:border-slate-300">
+        Notes
+    </button>
+
+    <button hx-get="/books/{{.Book.ID}}/reviews"
+            hx-target="#tab-content"
+            hx-trigger="click, update-reviews from:body"
+            hx-swap="innerHTML"
+            id="tab-reviews"
+            hx-swap-oob="true"
+            class="px-6 py-3 border-b-2 border-teal-600 text-teal-600 font-medium">
+        Reviews
+    </button>
+{{end}}
+
+<!-- Partial templates for Notes -->
+{{define "htmxBookNotes"}}
+    <div class="space-y-6">
+        <!-- Add Note Button -->
+        {{if .IsAuthenticated}}
+            <div class="flex justify-end">
+                <button hx-get="/books/{{.Book.ID}}/note/new"
+                        hx-target="#tab-content"
+                        hx-swap="innerHTML focus-scroll:true"
+                        class="inline-flex items-center px-4 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-500 transition-colors">
+                    <iconify-icon icon="heroicons:plus" class="mr-2"></iconify-icon>
+                    Add Note
+                </button>
+            </div>
+        {{end}}
+
+        <!-- Notes List -->
+        {{if .Notes}}
+            <div class="space-y-4">
+                {{range .Notes}}
+                    <div id="note-card-{{.ID}}" class="bg-slate-50 rounded-lg p-4">
+                        <div class="flex justify-between items-start">
+                            <div class="space-y-2">
+                                {{if .PageNumber}}
+                                    <div class="text-sm font-medium text-slate-600">
+                                        Page {{.PageNumber}}
+                                    </div>
+                                {{end}}
+                                <p class="text-slate-800">{{.NoteText}}</p>
+                                <p class="text-sm text-slate-600">
+                                    Added on {{humanDate .CreatedAt}}
+                                </p>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            {{if eq .UserId $.AuthenticatedUserId}}
+                                <div class="flex gap-2">
+                                    <button hx-get="/books/note/{{.ID}}/edit"
+                                            hx-target="#tab-content"
+                                            hx-swap="innerHTML focus-scroll:true"
+                                            class="text-slate-600 hover:text-teal-600">
+                                        <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
+                                    </button>
+                                    <form hx-post="/books/note/delete"
+                                          hx-swap="delete"
+                                          hx-target="#note-card-{{.ID}}"
+                                          hx-confirm="Are you sure you want to delete this note?">
+                                        <input type="hidden" name="id" value="{{.ID}}">
+                                        <button type="submit"
+                                                class="text-slate-600 hover:text-red-600">
+                                            <iconify-icon icon="heroicons:trash"></iconify-icon>
+                                        </button>
+                                    </form>
+                                </div>
+                            {{end}}
+                        </div>
+                    </div>
+                {{end}}
+            </div>
+        {{else}}
+            <!-- Empty State -->
+            <div class="text-center py-12">
+                <div class="text-slate-400 mb-3">
+                    <iconify-icon icon="heroicons:document-text" width="48" class="inline-block"></iconify-icon>
+                </div>
+                <h3 class="text-lg font-medium text-slate-800">No notes yet</h3>
+                <p class="text-slate-600 mt-1">Start taking notes about this book</p>
+            </div>
+        {{end}}
+    </div>
+
+    <!-- HTMX Swap Oob -->
+    <button hx-get="/books/{{.Book.ID}}/notes"
+            hx-target="#tab-content"
+            hx-trigger="click, update-notes from:body"
+            hx-swap="innerHTML"
+            id="tab-notes"
+            hx-swap-oob="true"
+            class="px-6 py-3 border-b-2 border-teal-600 text-teal-600 font-medium">
+        Notes
+    </button>
+
+    <button hx-get="/books/{{.Book.ID}}/reviews"
+            hx-target="#tab-content"
+            hx-trigger="click, update-reviews from:body"
+            hx-swap="innerHTML"
+            id="tab-reviews"
+            hx-swap-oob="true"
+            class="px-6 py-3 border-b-2 border-transparent text-slate-600 hover:text-slate-800 hover:border-slate-300">
+        Reviews
+    </button>
+
+{{end}}
+
+{{define "htmxBookNoteForm"}}
+    <div class="space-y-6">
+        <!-- Back Button -->
+        <div class="flex justify-start">
+            <button hx-get="/books/{{.Book.ID}}/notes"
+                    hx-target="#tab-content"
+                    hx-swap="innerHTML"
+                    class="inline-flex items-center text-sm text-slate-600 hover:text-teal-600 transition-colors">
+                <iconify-icon icon="heroicons:arrow-long-left" class="mr-2"></iconify-icon>
+                Back to Notes
+            </button>
+        </div>
+
+        <!-- Form Container -->
+        <div class="bg-slate-50 rounded-lg p-6">
+            <h3 class="text-lg font-medium text-slate-800 mb-4">Add Note</h3>
+
+            <form
+                    {{if gt .Note.ID 0}}
+                        hx-post="/books/note/edit"
+                    {{else}}
+                        hx-post="/books/note/new"
+                    {{end}}
+                    class="space-y-6">
+
+                <!-- Hidden Book ID -->
+                <input type="hidden" name="book_id" value="{{.Book.ID}}">
+                <input type="hidden" name="id" value="{{.Form.Id}}">
+
+                <!-- Show any non-field errors -->
+                {{range .Form.NonFieldErrors}}
+                    <div class="bg-red-50 border border-red-100 text-red-600 text-sm rounded-md p-4">{{.}}</div>
+                {{end}}
+
+                <!-- Page Number Field -->
+                <div class="space-y-2">
+                    <label for="page_number" class="block text-sm font-medium text-slate-700">
+                        Page Number
+                    </label>
+                    <input type="number"
+                           name="page_number"
+                           id="page_number"
+                           value="{{.Form.PageNumber}}"
+                           placeholder="Enter page number"
+                           class="block w-32 rounded-md border-slate-300 shadow-sm focus:border-teal-500 focus:ring-teal-500">
+                    {{with .Form.FieldErrors.pageNumber}}
+                        <p class="text-sm text-red-600">{{.}}</p>
+                    {{end}}
+                </div>
+
+                <!-- Note Text Field -->
+                <div class="space-y-2">
+                    <label for="note_text" class="block text-sm font-medium text-slate-700">
+                        Note<span class="text-red-500">*</span>
+                    </label>
+                    <textarea name="note_text"
+                              id="note_text"
+                              rows="4"
+                              placeholder="Write your note here..."
+                              class="block w-full rounded-md border-slate-300 shadow-sm focus:border-teal-500 focus:ring-teal-500">{{.Form.NoteText}}</textarea>
+                    {{with .Form.FieldErrors.noteText}}
+                        <p class="text-sm text-red-600">{{.}}</p>
+                    {{end}}
+                </div>
+
+                <!-- Form Actions -->
+                <div class="flex justify-end gap-3 pt-4">
+                    <button type="button"
+                            hx-get="/books/{{.Book.ID}}/notes"
+                            hx-target="#tab-content"
+                            hx-swap="innerHTML"
+                            class="px-4 py-2 border border-slate-300 rounded-md text-slate-700 hover:bg-slate-50 transition-colors">
+                        Cancel
+                    </button>
+                    <button type="submit"
+                            class="px-4 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-500 transition-colors">
+                        Save Note
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- HTMX Swap Oob for tab states -->
+    <button hx-get="/books/{{.Book.ID}}/notes"
+            hx-target="#tab-content"
+            hx-trigger="click, update-notes from:body"
+            hx-swap="innerHTML"
+            id="tab-notes"
+            hx-swap-oob="true"
+            class="px-6 py-3 border-b-2 border-teal-600 text-teal-600 font-medium">
+        Notes
+    </button>
+
+    <button hx-get="/books/{{.Book.ID}}/reviews"
+            hx-target="#tab-content"
+            hx-trigger="click, update-reviews from:body"
+            hx-swap="innerHTML"
+            id="tab-reviews"
+            hx-swap-oob="true"
+            class="px-6 py-3 border-b-2 border-transparent text-slate-600 hover:text-slate-800 hover:border-slate-300">
+        Reviews
+    </button>
+{{end}}

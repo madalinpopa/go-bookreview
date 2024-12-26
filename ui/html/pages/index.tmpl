@@ -1,0 +1,141 @@
+{{template "base" .}}
+
+{{define "title"}}Home - Book Review{{end}}
+
+{{define "main"}}
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-2xl font-bold text-slate-800">Reading Dashboard</h1>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Total Books -->
+            <div class="bg-white p-6 rounded-lg shadow-sm">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-slate-600">Total Books</p>
+                        <p hx-get="/api/books/count"
+                           hx-trigger="load"
+                           hx-swap="innerHTML"
+                           class="text-2xl font-bold text-slate-800"></p>
+                    </div>
+                    <div class="text-teal-600">
+                        <iconify-icon icon="heroicons:book-open" width="24"></iconify-icon>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Books Read -->
+            <div class="bg-white p-6 rounded-lg shadow-sm">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-slate-600">Books Read</p>
+                        <p hx-get="/api/books/read"
+                           hx-trigger="load"
+                           hx-swap="innerHTML"
+                           class="text-2xl font-bold text-slate-800">0</p>
+                    </div>
+                    <div class="text-teal-600">
+                        <iconify-icon icon="heroicons:check-circle" width="24"></iconify-icon>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reviews -->
+            <div class="bg-white p-6 rounded-lg shadow-sm">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-slate-600">Reviews Written</p>
+                        <p hx-get="/api/reviews/count"
+                           hx-trigger="load"
+                           hx-swap="innerHTML"
+                           class="text-2xl font-bold text-slate-800">0</p>
+                    </div>
+                    <div class="text-teal-600">
+                        <iconify-icon icon="heroicons:star" width="24"></iconify-icon>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notes -->
+            <div class="bg-white p-6 rounded-lg shadow-sm">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-slate-600">Notes Added</p>
+                        <p hx-get="/api/notes/count"
+                           hx-trigger="load"
+                           hx-swap="innerHTML"
+                           class="text-2xl font-bold text-slate-800">0</p>
+                    </div>
+                    <div class="text-teal-600">
+                        <iconify-icon icon="heroicons:document-text" width="24"></iconify-icon>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Recent Books -->
+            <div class="bg-white p-6 rounded-lg shadow-sm">
+                <h2 class="text-lg font-semibold text-slate-800 mb-4">Recent Books</h2>
+                <div hx-get="/api/books/recent"
+                     hx-trigger="load"
+                     hx-swap="innerHTML"
+                     class="space-y-4"></div>
+            </div>
+
+            <!-- Recent Reviews -->
+            <div class="bg-white p-6 rounded-lg shadow-sm">
+                <h2 class="text-lg font-semibold text-slate-800 mb-4">Recent Reviews</h2>
+                <div hx-get="/api/reviews/recent"
+                     hx-trigger="load"
+                     hx-swap="innerHTML"
+                     class="space-y-4"></div>
+            </div>
+        </div>
+    </div>
+{{end}}
+
+{{define "htmxRecentBooks"}}
+    {{with .Books}}
+        {{range .}}
+
+            <!-- Book Item -->
+            <div class="flex items-center space-x-4">
+                <div class="flex-shrink-0 w-12 h-16 bg-slate-200 rounded">
+                    {{ if .ImageURL}}
+                        <img src="{{.ImageURL}}" alt="{{.Title}}" class="w-full h-full object-cover">
+                    {{end}}
+                </div>
+                <div>
+                    <p class="font-medium text-slate-800">{{.Title}}</p>
+                    <p class="text-sm text-slate-600">{{.Author}}</p>
+                </div>
+            </div>
+
+        {{end}}
+    {{end}}
+{{end}}
+
+{{define "htmxRecentReviews"}}
+    {{with .Reviews}}
+        {{range .}}
+            <div class="border-l-4 border-teal-500 pl-4">
+                <p class="text-sm text-slate-600">Book: {{.BookTitle}}</p>
+                <p class="text-slate-800 line-clamp-1">{{.ReviewText}}</p>
+                <div class="flex items-center mt-2">
+                    <div class="flex text-amber-500">
+                        <iconify-icon icon="heroicons:star-solid" width="16"></iconify-icon>
+                        <iconify-icon icon="heroicons:star-solid" width="16"></iconify-icon>
+                        <iconify-icon icon="heroicons:star-solid" width="16"></iconify-icon>
+                        <iconify-icon icon="heroicons:star-solid" width="16"></iconify-icon>
+                        <iconify-icon icon="heroicons:star" width="16"></iconify-icon>
+                    </div>
+                </div>
+            </div>
+        {{end}}
+    {{end}}
+{{end}}

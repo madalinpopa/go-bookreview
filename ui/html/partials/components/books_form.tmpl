@@ -1,0 +1,145 @@
+{{define "htmxBookForm"}}
+    <form
+            {{if gt .Book.ID 0}}
+                hx-post="/books/{{.Book.ID}}/edit"
+            {{ else }}
+                hx-post="/books/new"
+            {{end}}
+            hx-swap="innerHTML"
+            hx-target="#book-form"
+            enctype="multipart/form-data"
+            class="space-y-6">
+        {{range .Form.NonFieldErrors}}
+            <div class="bg-red-50 border border-red-100 text-red-600 text-sm rounded-md p-4">{{.}}</div>
+        {{end}}
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label for="title" class="block text-sm font-medium text-slate-700 mb-1">Title<span
+                            class="text-red-500">*</span></label>
+                <input type="text"
+                       name="title"
+                       id="title"
+                       value="{{or .Form.Title .Book.Title}}"
+                       class="block w-full rounded-md border-slate-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"/>
+                {{with .Form.FieldErrors.title}}
+                    <p class="mt-1 text-sm text-red-600">{{.}}</p>
+                {{end}}
+            </div>
+
+            <div>
+                <label for="author" class="block text-sm font-medium text-slate-700 mb-1">Author<span
+                            class="text-red-500">*</span></label>
+                <input type="text"
+                       name="author"
+                       id="author"
+                       value="{{or .Form.Author .Book.Author}}"
+                       class="block w-full rounded-md border-slate-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"/>
+                {{with .Form.FieldErrors.author}}
+                    <p class="mt-1 text-sm text-red-600">{{.}}</p>
+                {{end}}
+            </div>
+
+            <div>
+                <label for="isbn" class="block text-sm font-medium text-slate-700 mb-1">ISBN</label>
+                <input type="text"
+                       name="isbn"
+                       id="isbn"
+                       value="{{or .Form.ISBN .Book.ISBN}}"
+                       placeholder="Enter ISBN-10 or ISBN-13"
+                       class="block w-full rounded-md border-slate-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"/>
+                {{with .Form.FieldErrors.isbn}}
+                    <p class="mt-1 text-sm text-red-600">{{.}}</p>
+                {{end}}
+            </div>
+
+            <div>
+                <label for="publication_year" class="block text-sm font-medium text-slate-700 mb-1">Publication
+                    Year</label>
+                <input type="number"
+                       name="publication_year"
+                       id="publication_year"
+                       value="{{or .Form.PublicationYear .Book.PublicationYear}}"
+                       placeholder="YYYY"
+                       class="block w-full rounded-md border-slate-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"/>
+                {{with .Form.FieldErrors.publicationYear}}
+                    <p class="mt-1 text-sm text-red-600">{{.}}</p>
+                {{end}}
+            </div>
+
+            <div class="md:col-span-2">
+                <label for="status" class="block text-sm font-medium text-slate-700 mb-1">Reading
+                    Status</label>
+                <select name="status"
+                        id="status"
+                        class="block w-full rounded-md border-slate-300 shadow-sm focus:border-teal-500 focus:ring-teal-500">
+                    <option value="want_to_read" {{if eq (or .Form.Status .Book.Status) "want_to_read"}}selected{{end}}>
+                        Want to Read
+                    </option>
+                    <option value="reading" {{if eq (or .Form.Status .Book.Status) "reading"}}selected{{end}}>
+                        Currently Reading
+                    </option>
+                    <option value="finished" {{if eq (or .Form.Status .Book.Status) "finished"}}selected{{end}}>
+                        Finished
+                    </option>
+                </select>
+                {{with .Form.FieldErrors.status}}
+                    <p class="mt-1 text-sm text-red-600">{{.}}</p>
+                {{end}}
+            </div>
+
+            <div class="md:col-span-2">
+                <!-- Current Image Preview -->
+                {{ with .Book}}
+                    {{if .ImageURL}}
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Current Cover</label>
+                            <div class="w-32 aspect-[3/4] bg-slate-100 rounded-lg overflow-hidden">
+                                <img src="{{.ImageURL}}" alt="Current cover"
+                                     class="w-full h-full object-cover">
+                            </div>
+                        </div>
+                    {{end}}
+                {{end}}
+                <label for="image_upload" class="block text-sm font-medium text-slate-700 mb-1">
+                    Book Cover
+                </label>
+                {{if .Book.ImageURL}}
+                    <input type="hidden" name="current_image_url" value="{{.Book.ImageURL}}">
+                {{end}}
+                <input type="file"
+                       name="image_upload"
+                       id="image_upload"
+                       accept="image/jpeg,image/png"
+                       class="block w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0
+                                                 file:bg-teal-600 file:text-white hover:file:bg-teal-500 file:transition-colors
+                                                 text-slate-600 text-sm"/>
+                <p class="mt-1 text-xs text-slate-500">
+                    Maximum file size: 5MB. Accepted formats: JPEG, PNG
+                </p>
+                {{with .Form.FieldErrors.imageUpload}}
+                    <p class="mt-1 text-sm text-red-600">{{.}}</p>
+                {{end}}
+            </div>
+        </div>
+
+        <div class="flex justify-end gap-4 pt-6 border-t border-slate-200">
+            <button type="button"
+                    hx-get="/books"
+                    hx-push-url="true"
+                    hx-swap="innerHTML"
+                    hx-target="#books-content"
+                    class="px-4 py-2 border border-slate-300 rounded-md text-slate-700 hover:bg-slate-50 transition-colors">
+                Cancel
+            </button>
+            <button type="submit"
+                    class="px-4 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-500 transition-colors">
+                {{if gt .Book.ID 0}}
+                    Save changes
+                {{else}}
+                    Add Book
+                {{end}}
+            </button>
+        </div>
+    </form>
+{{end}}

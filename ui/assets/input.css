@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+[x-cloak] {
+    display: none !important;
+}
+
+.required-field::after {
+    content: '*';
+    color: #EF4444; /* Tailwind's red-500 */
+    margin-left: 0.25rem;
+}
+
+.htmx-indicator {
+    opacity: 0;
+    transition: opacity 500ms ease-in;
+
+}
+
+.htmx-request .htmx-indicator {
+    opacity: 1;
+}
+
+.htmx-request.htmx-indicator {
+    opacity: 1;
+}
+
+.fade-me-out.htmx-swapping {
+    opacity: 0;
+    transition: opacity 1s ease-out;
+}
+
+#fade-me-in.htmx-added {
+    opacity: 0;
+}
+#fade-me-in {
+    opacity: 1;
+    transition: opacity 1s ease-out;
+}
+
+form.htmx-request {
+    opacity: .5;
+    transition: opacity 1ms linear;
+}

@@ -1,0 +1,49 @@
+{{template "base" .}}
+
+{{define "title"}}Book Review - Update{{end}}
+
+{{define "main"}}
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 h-full flex flex-col">
+
+        <!-- Header with Search -->
+        {{template "booksHeader" .}}
+
+        <!-- Update Book Form -->
+        <div hx-trigger="revealed"
+             hx-get="/books/{{.Book.ID}}/edit"
+             hx-swap="innerHTML"
+             hx-target="#books-content">
+            <div id="books-content"></div>
+        </div>
+    </div>
+
+{{end}}
+
+<!-- Partial template to edit book -->
+{{define "htmxBookUpdate"}}
+    <div class="max-w-2xl mx-auto">
+        <!-- Back button -->
+        <div class="mb-6">
+            <button hx-get="/books/{{.Book.ID}}"
+                    hx-target="#books-content"
+                    hx-swap="innerHTML"
+                    hx-push-url="true"
+                    class="inline-flex items-center text-sm text-slate-600 hover:text-teal-600 transition-colors">
+                <iconify-icon icon="heroicons:arrow-long-left" class="mr-2"></iconify-icon>
+                Back to Book Details
+            </button>
+        </div>
+
+        <!-- Form Container -->
+        <div class="bg-white p-8 rounded-lg shadow-sm">
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-slate-800">Edit Book</h2>
+                <p class="text-sm text-slate-600 mt-1">Update the book's information</p>
+            </div>
+
+            <div id="book-form">
+                {{ template "htmxBookForm" .}}
+            </div>
+        </div>
+    </div>
+{{end}}

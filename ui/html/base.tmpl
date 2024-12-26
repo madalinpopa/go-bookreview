@@ -1,0 +1,93 @@
+{{ define "base" }}
+    <!DOCTYPE html>
+    <html lang="en" class="h-full bg-slate-800">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="htmx-config"
+              content='{
+                    "responseHandling":[
+                        {"code":"204", "swap": false},
+                        {"code":"[23]..", "swap": true},
+                        {"code":"422", "swap": true},
+                        {"code":"[45]..", "swap": false, "error":true},
+                        {"code":"...", "swap": true}
+                    ]
+               }'
+        />
+        <link rel="icon" href="/static/img/favicon.ico">
+        <link rel="stylesheet" href="/static/css/output.css" type="text/css">
+
+        <title>{{ template "title" .}}</title>
+
+        <script src="https://cdn.jsdelivr.net/npm/iconify-icon@2.1.0/dist/iconify-icon.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+            document.addEventListener("htmx:confirm", function (e) {
+                if (!e.detail.elt.hasAttribute('hx-confirm')) return
+
+                // This will prevent the request from being issued to later manually issue it
+                e.preventDefault()
+
+                Swal.fire({
+                    title: 'Confirm deletion',
+                    text: `${e.detail.question}`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Delete',
+                    cancelButtonText: 'Cancel',
+                    confirmButtonColor: '#0D9488', // teal-600
+                    cancelButtonColor: '#475569',  // slate-600
+                    customClass: {
+                        title: 'text-slate-800',
+                        htmlContainer: 'text-slate-600',
+                        popup: 'rounded-lg shadow-sm',
+                        confirmButton: 'rounded-md',
+                        cancelButton: 'rounded-md'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        e.detail.issueRequest(true);
+                    }
+                });
+            })
+        </script>
+    </head>
+
+    <body class="antialiased h-full bg-slate-50">
+
+    <div class="min-h-[100dvh] grid grid-rows-[auto_1fr_auto] h-full">
+
+        <header>
+            {{block "header" .}}
+                {{template "nav" .}}
+            {{end}}
+        </header>
+
+        <main class="h-full bg-slate-50">
+            {{block "main" .}}
+                <h1>Main</h1>
+            {{end}}
+        </main>
+
+        <footer>
+            {{block "footer" .}}
+                {{template "footer" .}}
+            {{end}}
+        </footer>
+
+    </div>
+
+    <script src="/static/js/main.js" type="text/javascript"></script>
+    <script src="/static/js/htmx.min.js" type="text/javascript"></script>
+    <script>
+
+        document.body.addEventListener('htmx:configRequest', function (evt) {
+            evt.detail.headers['X-CSRF-Token'] = "{{.CSRFToken}}";
+        });
+
+    </script>
+    </body>
+    </html>
+{{ end }}

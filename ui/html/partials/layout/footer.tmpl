@@ -1,0 +1,37 @@
+{{define "footer"}}
+    <footer class="bg-slate-800 text-slate-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- About -->
+                <div class="space-y-4">
+                    <h3 class="text-sm font-semibold text-teal-400 uppercase">About BookReview</h3>
+                    <p class="text-sm">
+                        A personal book tracking application that helps you maintain your reading list,
+                        write reviews, and keep notes for your favorite books.
+                    </p>
+                </div>
+
+                <!-- Links -->
+                <div class="space-y-4">
+                    <h3 class="text-sm font-semibold text-teal-400 uppercase">Links</h3>
+                    <ul class="space-y-2">
+                        <li>
+                            <a href="https://github.com/madalinpopa/go-bookreview"
+                               class="hover:text-teal-400 transition-colors inline-flex items-center gap-2">
+                                <iconify-icon icon="octicon:mark-github-16"></iconify-icon>
+                                GitHub Repository
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="mt-8 pt-8 border-t border-slate-700 text-center">
+                <p class="text-sm">
+                    Made with <a class="text-teal-400 hover:text-teal-300" href="https://golang.org">Go</a>
+                    in {{.CurrentYear}}
+                </p>
+            </div>
+        </div>
+    </footer>
+{{end}}

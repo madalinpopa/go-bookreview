@@ -1,0 +1,67 @@
+{{define "pagination"}}
+    {{if gt .TotalPages 1}}
+        <div class="mt-8 flex items-center justify-between border-t border-slate-200 pt-6">
+            <div class="flex items-center">
+                <p class="text-sm text-slate-700">
+                    Showing
+                    {{if eq .Total 0}}
+                        0 results
+                    {{else}}
+                        <span class="font-medium">{{mul (sub .Page 1) .PageSize | add 1}}</span>
+                        to
+                        <span class="font-medium">{{min (mul .Page .PageSize) .Total}}</span>
+                        of
+                        <span class="font-medium">{{.Total}}</span>
+                        results
+                    {{end}}
+                </p>
+            </div>
+            <div class="flex items-center gap-2">
+                {{/* Previous button */}}
+                {{if gt .Page 1}}
+                    <button hx-get="/books?page={{sub .Page 1}}"
+                            hx-target="#books-content"
+                            class="px-3 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">
+                        Previous
+                    </button>
+                {{else}}
+                    <button class="px-3 py-1 rounded border border-slate-300 text-slate-700 opacity-50 cursor-not-allowed"
+                            disabled>
+                        Previous
+                    </button>
+                {{end}}
+
+                {{/* Page numbers */}}
+                {{$currentPage := .Page}}
+                {{range $i := iterate .TotalPages}}
+                    {{$pageNum := add $i 1}}
+                    {{if eq $pageNum $currentPage}}
+                        <button class="px-3 py-1 rounded bg-teal-600 text-white">
+                            {{$pageNum}}
+                        </button>
+                    {{else}}
+                        <button hx-get="/books?page={{$pageNum}}"
+                                hx-target="#books-content"
+                                class="px-3 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">
+                            {{$pageNum}}
+                        </button>
+                    {{end}}
+                {{end}}
+
+                {{/* Next button */}}
+                {{if lt .Page .TotalPages}}
+                    <button hx-get="/books?page={{add .Page 1}}"
+                            hx-target="#books-content"
+                            class="px-3 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">
+                        Next
+                    </button>
+                {{else}}
+                    <button class="px-3 py-1 rounded border border-slate-300 text-slate-700 opacity-50 cursor-not-allowed"
+                            disabled>
+                        Next
+                    </button>
+                {{end}}
+            </div>
+        </div>
+    {{end}}
+{{end}}
