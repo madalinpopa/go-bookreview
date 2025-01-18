@@ -82,7 +82,7 @@ Before you begin, ensure you have the following installed:
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/go-bookreview.git
+git clone https://github.com/madalinpopa/go-bookreview.git
 cd go-bookreview
 ```
 2. Build Docker image:
