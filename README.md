@@ -9,9 +9,6 @@ A demo can be seen here: [demo](https://books.coderustle.dev)
 ### Home Page
 ![Home Page](ui/assets/demo/home.png)
 
-### Books List
-![Books List](/ui/assets/demo/books.png)
-
 ## Features
 
 - **User Authentication**
