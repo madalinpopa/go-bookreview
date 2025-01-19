@@ -2,10 +2,11 @@ package views
 
 import (
 	"errors"
+	"net/http"
+
 	"github.com/madalinpopa/go-bookreview/internal/app"
 	"github.com/madalinpopa/go-bookreview/internal/forms"
 	"github.com/madalinpopa/go-bookreview/internal/models"
-	"net/http"
 )
 
 // LoginPage handles the HTTP request for rendering the user login page with a preloaded form and template data.
@@ -44,7 +45,7 @@ func LoginPost(app *app.App) http.HandlerFunc {
 			if errors.Is(err, models.ErrInvalidCredentials) {
 				form.AddNonFieldError("Invalid email or password.")
 				data.Form = form
-				app.Render(w, r, "auth/login.tmpl", data, http.StatusUnprocessableEntity)
+				app.Render(w, r, "login.tmpl", data, http.StatusUnprocessableEntity)
 			} else {
 				app.ServerError(w, r, err)
 			}
@@ -67,7 +68,6 @@ func LoginPost(app *app.App) http.HandlerFunc {
 // renews the session token, and removes authentication session data.
 func LogoutPost(app *app.App) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
 		// Renew session token to prevent session fixation attacks
 		err := app.SessionManager.RenewToken(r.Context())
 		if err != nil {
