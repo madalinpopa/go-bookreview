@@ -246,3 +246,60 @@ func TestMinChars(t *testing.T) {
 		})
 	}
 }
+
+// TestMatches verifies the Matches function using a set of test cases for validating email address formats.
+func TestMatches(t *testing.T) {
+	tests := []struct {
+		name  string
+		value string
+		want  bool
+	}{
+		{
+			name:  "valid email",
+			value: "user@example.com",
+			want:  true,
+		},
+		{
+			name:  "email with subdomain",
+			value: "user@sub.example.com",
+			want:  true,
+		},
+		{
+			name:  "email with plus",
+			value: "user+tag@example.com",
+			want:  true,
+		},
+		{
+			name:  "missing @",
+			value: "userexample.com",
+			want:  false,
+		},
+		{
+			name:  "missing domain",
+			value: "user@",
+			want:  false,
+		},
+		{
+			name:  "missing local part",
+			value: "@example.com",
+			want:  false,
+		},
+		{
+			name:  "empty string",
+			value: "",
+			want:  false,
+		},
+		{
+			name:  "email with special characters",
+			value: "user.name+tag@example-site.co.uk",
+			want:  true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := Matches(tt.value, EmailRX)
+			testutil.Equal(t, got, tt.want)
+		})
+	}
+}
