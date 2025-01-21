@@ -186,3 +186,63 @@ func TestValidDate(t *testing.T) {
 		})
 	}
 }
+
+// TestMinChars tests the MinChars function to ensure it correctly verifies if a string meets the minimum character requirement.
+func TestMinChars(t *testing.T) {
+	tests := []struct {
+		name  string
+		value string
+		min   int
+		want  bool
+	}{
+		{
+			name:  "empty string",
+			value: "",
+			min:   1,
+			want:  false,
+		},
+		{
+			name:  "exactly minimum length",
+			value: "12345",
+			min:   5,
+			want:  true,
+		},
+		{
+			name:  "above minimum length",
+			value: "123456",
+			min:   5,
+			want:  true,
+		},
+		{
+			name:  "below minimum length",
+			value: "1234",
+			min:   5,
+			want:  false,
+		},
+		{
+			name:  "minimum zero",
+			value: "",
+			min:   0,
+			want:  true,
+		},
+		{
+			name:  "unicode characters",
+			value: "Hello世界",
+			min:   5,
+			want:  true,
+		},
+		{
+			name:  "spaces only",
+			value: "     ",
+			min:   3,
+			want:  true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := MinChars(tt.value, tt.min)
+			testutil.Equal(t, got, tt.want)
+		})
+	}
+}
