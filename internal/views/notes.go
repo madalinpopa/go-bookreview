@@ -160,7 +160,7 @@ func UpdateNotePost(app *app.App) http.HandlerFunc {
 			return
 		}
 
-		note, err := app.Models.Notes.Retrieve(form.Id, userId)
+		note, err := app.Models.Notes.Retrieve(userId, form.Id)
 		if err != nil {
 			if errors.Is(err, models.ErrNoRecord) {
 				app.ClientError(w, r, http.StatusNotFound, err)
@@ -170,7 +170,7 @@ func UpdateNotePost(app *app.App) http.HandlerFunc {
 			return
 		}
 
-		err = app.Models.Notes.Update(note.ID, note.UserId, form.NoteText, form.PageNumber)
+		err = app.Models.Notes.Update(note.UserId, note.ID, form.NoteText, form.PageNumber)
 		if err != nil {
 			if errors.Is(err, models.ErrNoRecord) {
 				app.ClientError(w, r, http.StatusNotFound, err)
