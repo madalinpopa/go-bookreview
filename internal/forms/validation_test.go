@@ -303,3 +303,65 @@ func TestMatches(t *testing.T) {
 		})
 	}
 }
+
+// TestValidNumber tests the ValidNumber function to ensure it correctly validates if a string represents a valid integer.
+func TestValidNumber(t *testing.T) {
+	tests := []struct {
+		name  string
+		value string
+		want  bool
+	}{
+		{
+			name:  "valid integer",
+			value: "123",
+			want:  true,
+		},
+		{
+			name:  "zero",
+			value: "0",
+			want:  true,
+		},
+		{
+			name:  "negative number",
+			value: "-123",
+			want:  true,
+		},
+		{
+			name:  "empty string",
+			value: "",
+			want:  false,
+		},
+		{
+			name:  "decimal number",
+			value: "123.45",
+			want:  false,
+		},
+		{
+			name:  "non-numeric string",
+			value: "abc",
+			want:  false,
+		},
+		{
+			name:  "mixed string",
+			value: "123abc",
+			want:  false,
+		},
+		{
+			name:  "spaces only",
+			value: "   ",
+			want:  false,
+		},
+		{
+			name:  "number with spaces",
+			value: "  123  ",
+			want:  false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := ValidNumber(tt.value)
+			testutil.Equal(t, got, tt.want)
+		})
+	}
+}
