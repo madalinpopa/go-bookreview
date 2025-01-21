@@ -365,3 +365,63 @@ func TestValidNumber(t *testing.T) {
 		})
 	}
 }
+
+// TestMaxNumber verifies the behavior of the MaxNumber function with various input values and expected results.
+func TestMaxNumber(t *testing.T) {
+	tests := []struct {
+		name  string
+		value int
+		max   int
+		want  bool
+	}{
+		{
+			name:  "below maximum",
+			value: 3,
+			max:   5,
+			want:  true,
+		},
+		{
+			name:  "equal to maximum",
+			value: 5,
+			max:   5,
+			want:  true,
+		},
+		{
+			name:  "above maximum",
+			value: 7,
+			max:   5,
+			want:  false,
+		},
+		{
+			name:  "zero value",
+			value: 0,
+			max:   5,
+			want:  true,
+		},
+		{
+			name:  "negative value",
+			value: -5,
+			max:   5,
+			want:  true,
+		},
+		{
+			name:  "zero maximum",
+			value: 1,
+			max:   0,
+			want:  false,
+		},
+		{
+			name:  "negative maximum",
+			value: -10,
+			max:   -5,
+			want:  true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := MaxNumber(tt.value, tt.max)
+			testutil.Equal(t, got, tt.want)
+		})
+	}
+}
