@@ -20,10 +20,9 @@ func NoError(t *testing.T, err error) {
 }
 
 // Error fails the test if the provided error is nil, optionally logging a custom message with additional arguments.
-func Error(t *testing.T, err error, msgAndArgs ...interface{}) {
+func Error(t *testing.T, err error) {
 	t.Helper()
 	if err == nil {
-
 		t.Errorf("expected error but got nil")
 	}
 }
