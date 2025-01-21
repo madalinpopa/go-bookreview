@@ -70,6 +70,9 @@ makemigrations name:
 seed:
     go run ./cmd/seed/
 
+# Run tests
+test:
+    go test ./...
 
 # Build docker image
 docker-build:
