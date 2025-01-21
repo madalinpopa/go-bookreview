@@ -3,6 +3,7 @@ package forms
 import (
 	"github.com/madalinpopa/go-bookreview/internal/testutil"
 	"testing"
+	"time"
 )
 
 // TestNotBlank verifies the behavior of the NotBlank function with various string inputs and their expected boolean results.
@@ -144,6 +145,43 @@ func TestPermittedValue(t *testing.T) {
 	for _, tt := range intTests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := PermittedValue(tt.value, tt.permitted...)
+			testutil.Equal(t, got, tt.want)
+		})
+	}
+}
+
+// TestValidDate validates the behavior of the ValidDate function by checking various inputs and comparing them to expected results.
+func TestValidDate(t *testing.T) {
+	tests := []struct {
+		name string
+		date time.Time
+		want bool
+	}{
+		{
+			name: "zero date",
+			date: time.Time{}, // Zero value
+			want: false,
+		},
+		{
+			name: "valid date",
+			date: time.Date(2024, time.January, 1, 0, 0, 0, 0, time.UTC),
+			want: true,
+		},
+		{
+			name: "current time",
+			date: time.Now(),
+			want: true,
+		},
+		{
+			name: "past date",
+			date: time.Date(2020, time.December, 25, 0, 0, 0, 0, time.UTC),
+			want: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := ValidDate(tt.date)
 			testutil.Equal(t, got, tt.want)
 		})
 	}
