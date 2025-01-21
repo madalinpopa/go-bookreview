@@ -84,47 +84,63 @@ func TestMaxChars(t *testing.T) {
 	}
 }
 
-// TestPermittedValue verifies the behavior of the PermittedValue function by testing various scenarios and expected results.
 func TestPermittedValue(t *testing.T) {
-	tests := []struct {
+	// String tests
+	stringTests := []struct {
 		name      string
-		value     interface{}
-		permitted []interface{}
+		value     string
+		permitted []string
 		want      bool
 	}{
 		{
 			name:      "string in permitted values",
 			value:     "reading",
-			permitted: []interface{}{"want_to_read", "reading", "finished"},
+			permitted: []string{"want_to_read", "reading", "finished"},
 			want:      true,
 		},
 		{
 			name:      "string not in permitted values",
 			value:     "unknown",
-			permitted: []interface{}{"want_to_read", "reading", "finished"},
+			permitted: []string{"want_to_read", "reading", "finished"},
 			want:      false,
 		},
 		{
 			name:      "empty permitted values",
 			value:     "reading",
-			permitted: []interface{}{},
+			permitted: []string{},
 			want:      false,
 		},
+	}
+
+	for _, tt := range stringTests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := PermittedValue(tt.value, tt.permitted...)
+			testutil.Equal(t, got, tt.want)
+		})
+	}
+
+	// Integer tests
+	intTests := []struct {
+		name      string
+		value     int
+		permitted []int
+		want      bool
+	}{
 		{
 			name:      "int in permitted values",
 			value:     1,
-			permitted: []interface{}{1, 2, 3},
+			permitted: []int{1, 2, 3},
 			want:      true,
 		},
 		{
 			name:      "int not in permitted values",
 			value:     4,
-			permitted: []interface{}{1, 2, 3},
+			permitted: []int{1, 2, 3},
 			want:      false,
 		},
 	}
 
-	for _, tt := range tests {
+	for _, tt := range intTests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := PermittedValue(tt.value, tt.permitted...)
 			testutil.Equal(t, got, tt.want)
