@@ -105,7 +105,7 @@ func UpdateNote(app *app.App) http.HandlerFunc {
 			app.ClientError(w, r, http.StatusUnauthorized, errors.New("user not authenticated"))
 		}
 
-		note, err := app.Models.Notes.Retrieve(noteId, userId)
+		note, err := app.Models.Notes.Retrieve(userId, noteId)
 		if err != nil {
 			if errors.Is(err, models.ErrNoRecord) {
 				app.ClientError(w, r, http.StatusNotFound, err)
