@@ -84,6 +84,7 @@ func TestMaxChars(t *testing.T) {
 	}
 }
 
+// TestPermittedValue tests the PermittedValue function for both string and integer types with various input scenarios.
 func TestPermittedValue(t *testing.T) {
 	// String tests
 	stringTests := []struct {
