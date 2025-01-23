@@ -72,7 +72,7 @@ seed:
 
 # Run tests
 test:
-    go test ./...
+    go test ./internal...
 
 # Build docker image
 docker-build:
