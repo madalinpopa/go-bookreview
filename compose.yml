@@ -1,0 +1,27 @@
+services:
+  bookreview:
+    image: coderustle/bookreview
+    ports:
+      - "4000:4000"
+    volumes:
+      - type: volume
+        source: bookreview_data
+        target: /app/data
+      - type: volume
+        source: bookreview_upload
+        target: /app/uploads
+    networks:
+      - public
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+
+networks:
+  public:
+    external: true
+
+volumes:
+  bookreview_data:
+  bookreview_upload:
