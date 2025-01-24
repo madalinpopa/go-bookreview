@@ -1,4 +1,6 @@
 # Personal BookReview
+![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/madalinpopa/go-bookreview) ![GitHub License](https://img.shields.io/github/license/madalinpopa/go-bookreview)
+
 
 A web application built with Go that helps you manage your personal book collection, track reading progress, write reviews, and take notes. Perfect for book enthusiasts who want to maintain a digital library of their reading journey.
 
