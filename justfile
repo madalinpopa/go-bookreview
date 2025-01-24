@@ -87,3 +87,7 @@ docker-run:
               -v bookreview_uploads:/app/uploads \
               -p 4000:4000 \
               coderustle/bookreview:latest
+
+# Deploy using Docker stack
+deploy:
+    docker stack deploy -c compose.yml bookreview --detach=true --with-registry-auth
