@@ -121,18 +121,20 @@
 {{end}}
 
 {{define "htmxRecentReviews"}}
-    {{with .Reviews}}
-        {{range .}}
+    {{if .Reviews}}
+        {{range $review := .Reviews}}
             <div class="border-l-4 border-teal-500 pl-4">
-                <p class="text-sm text-slate-600">Book: {{.BookTitle}}</p>
-                <p class="text-slate-800 line-clamp-1">{{.ReviewText}}</p>
+                <p class="text-sm text-slate-600">Book: {{$review.BookTitle}}</p>
+                <p class="text-slate-800 line-clamp-1">{{$review.ReviewText}}</p>
                 <div class="flex items-center mt-2">
                     <div class="flex text-amber-500">
-                        <iconify-icon icon="heroicons:star-solid" width="16"></iconify-icon>
-                        <iconify-icon icon="heroicons:star-solid" width="16"></iconify-icon>
-                        <iconify-icon icon="heroicons:star-solid" width="16"></iconify-icon>
-                        <iconify-icon icon="heroicons:star-solid" width="16"></iconify-icon>
-                        <iconify-icon icon="heroicons:star" width="16"></iconify-icon>
+                        {{range $i := iterate 5}}
+                            {{if le (add $i 1) $review.Rating}}
+                                <iconify-icon icon="heroicons:star-solid" width="16"></iconify-icon>
+                            {{else}}
+                                <iconify-icon icon="heroicons:star" width="16"></iconify-icon>
+                            {{end}}
+                        {{end}}
                     </div>
                 </div>
             </div>
