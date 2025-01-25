@@ -1,6 +1,10 @@
 # Build stage
 FROM golang:1.23-bookworm AS builder
 
+ENV CGO_ENABLED=1
+ENV GOOS=linux
+ENV GOARCH=amd64
+
 # Set working directory
 WORKDIR /app
 
@@ -22,8 +26,7 @@ COPY . .
 RUN tailwindcss -i ui/assets/input.css -o ui/static/css/output.css --minify
 
 # Build the application with embedded files
-RUN CGO_ENABLED=1 GOOS=linux GOARCH=amd64 \
-    go build -o main ./cmd/web
+RUN go build -o main ./cmd/web
 
 # Final stage
 FROM debian:bookworm-slim
