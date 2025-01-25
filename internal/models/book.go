@@ -313,7 +313,7 @@ func (m *BookModel) List(page, pageSize int) (PaginatedBooks, error) {
 
 // Filter retrieves books where the title, notes, or reviews contain the given search term.
 func (m *BookModel) Filter(searchTerm string) ([]Book, error) {
-	searchTerm = searchTerm + "%"
+	searchTerm = "%" + searchTerm + "%"
 
 	stmt := `
 	SELECT DISTINCT b.id, b.title, b.author, b.isbn, b.publication_year, b.created_at, b.updated_at, b.image_url
